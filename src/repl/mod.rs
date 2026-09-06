@@ -6,7 +6,9 @@ use self::completer::ReplCompleter;
 use self::highlighter::ReplHighlighter;
 use self::prompt::ReplPrompt;
 
-use crate::client::{call_chat_completions, call_chat_completions_streaming};
+use crate::client::{
+    call_chat_completions, call_chat_completions_streaming, list_models, ModelType,
+};
 use crate::config::{
     macro_execute, AgentVariables, AssertState, Config, GlobalConfig, Input, LastMessage,
     StateFlags,
@@ -19,6 +21,7 @@ use crate::utils::{
 use anyhow::{bail, Context, Result};
 use crossterm::cursor::SetCursorStyle;
 use fancy_regex::Regex;
+use inquire::Select;
 use reedline::CursorConfig;
 use reedline::{
     default_emacs_keybindings, default_vi_insert_keybindings, default_vi_normal_keybindings,
@@ -413,7 +416,26 @@ pub async fn run_repl_command(
                 Some(name) => {
                     config.write().set_model(name)?;
                 }
-                None => println!("Usage: .model <name>"),
+                // Tanpa argumen: picker interaktif seperti di gambar
+                // (kolom deskripsi = token limit & harga, dari Model::description).
+                // Alternatif cepat: Tab setelah ".model " untuk menu autocomplete.
+                None => {
+                    let models = list_models(&config.read(), ModelType::Chat);
+                    if models.is_empty() {
+                        bail!("No chat models. Tambahkan client dulu (jalankan setup config / set MODEL_API_KEY dkk).");
+                    }
+                    let options: Vec<String> = models
+                        .iter()
+                        .map(|m| format!("{:<45} {}", m.id(), m.description()))
+                        .collect();
+                    let ans =
+                        Select::new("Select model (atau: .model <id>, Tab untuk autocomplete):", options)
+                            .with_page_size(15)
+                            .prompt()?;
+                    let id = ans.split_whitespace().next().unwrap_or_default();
+                    config.write().set_model(id)?;
+                    println!("(model: {id})");
+                }
             },
             ".prompt" => match args {
                 Some(text) => {

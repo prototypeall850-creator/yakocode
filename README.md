@@ -146,6 +146,10 @@ yakocode
 yakocode -s kerjaku -r programmer
 ```
 
+Di dalam REPL: `.help` untuk daftar perintah, `.model` (tanpa argumen)
+untuk picker list model interaktif (atau tekan Tab setelah `.model `
+untuk menu autocomplete seperti di gambar).
+
 ### TUI mode (Ratatui + MCP)
 
 ```sh
