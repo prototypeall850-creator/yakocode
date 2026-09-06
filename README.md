@@ -47,42 +47,13 @@ Versi tertentu atau folder tertentu:
 YAKOCODE_VERSION=v0.1.0 YAKOCODE_INSTALL_DIR=~/.local/bin sh install.sh
 ```
 
-### Opsi 2 — download binary manual
+Yang dibutuhkan hanya `curl` + `tar` (umumnya sudah bawaan).
+Binary-nya statik/mandiri — tidak perlu install dependensi runtime apa pun.
+Satu-satunya opsional: Node.js/`npx` untuk MCP filesystem server
+(tanpa itu `/read` tetap jalan via fallback baca-langsung).
+Di Termux kalau `tar` belum ada: `pkg install tar` dulu.
 
-Halaman release: https://github.com/prototypeall850-creator/yakocode/releases
-
-| Perangkat | File |
-| --------- | ---- |
-| Linux x86_64 | `yakocode-v0.1.0-x86_64-unknown-linux-musl.tar.gz` (statik, jalan di mana saja) |
-| macOS Apple Silicon | `yakocode-v0.1.0-aarch64-apple-darwin.tar.gz` |
-| macOS Intel | `yakocode-v0.1.0-x86_64-apple-darwin.tar.gz` |
-| Termux / Android aarch64 | `yakocode-v0.1.0-aarch64-linux-android.tar.gz` |
-| Windows x86_64 | `yakocode-v0.1.0-x86_64-pc-windows-msvc.zip` |
-
-```sh
-# Linux / Termux
-tar -xzf yakocode-v0.1.0-*.tar.gz
-./yakocode-v0.1.0-*/yakocode --help
-```
-
-Di Termux:
-
-```sh
-pkg install tar
-tar -xzf yakocode-v0.1.0-aarch64-linux-android.tar.gz
-./yakocode-v0.1.0-aarch64-linux-android/yakocode --help
-# opsional: pindah ke PATH
-# mv yakocode-v0.1.0-aarch64-linux-android/yakocode $PREFIX/bin/
-```
-
-### Opsi 3 — via cargo
-
-```sh
-cargo install --git https://github.com/prototypeall850-creator/yakocode
-yakocode --help
-```
-
-### Opsi 4 — dari source
+### Opsi 2 — dari source
 
 ```sh
 git clone https://github.com/prototypeall850-creator/yakocode
@@ -90,7 +61,7 @@ cd yakocode
 cargo install --path .
 ```
 
-### Opsi 5 — binary debug manual
+### Opsi 3 — binary debug manual
 
 ```sh
 cargo build
@@ -99,20 +70,20 @@ cargo build
 
 ## Update
 
-Di HP (Termux) atau di mana pun, cukup:
+Kalau install pakai one-liner/binary, update = jalankan one-liner lagi:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/prototypeall850-creator/yakocode/main/install.sh | sh
+```
+
+Kalau install via cargo, cukup:
 
 ```sh
 yakocode update
 ```
 
-Perintah ini menjalankan `cargo install --git <repo-yakocode>` ulang
-(butuh `cargo` + `git`). Alternatif manual:
-
-```sh
-cd yakocode
-git pull
-cargo install --path .
-```
+(`yakocode update` menjalankan `cargo install --git` ulang,
+jadi butuh `cargo` + `git`. Alternatif manual: `git pull && cargo install --path .`)
 
 > Catatan: karena `update` dipakai sebagai perintah khusus,
 > untuk chat yang isinya persis kata `update` gunakan `yakocode -- update`.
