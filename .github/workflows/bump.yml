@@ -12,6 +12,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     permissions:
       contents: write
+      actions: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,3 +46,11 @@ jobs:
           git commit -m "chore: bump v${{ steps.bump.outputs.version }}" -m "[skip ci]"
           git tag "v${{ steps.bump.outputs.version }}"
           git push origin main "v${{ steps.bump.outputs.version }}"
+
+      # Push pakai GITHUB_TOKEN tidak memicu workflow lain (aturan GitHub),
+      # jadi release dipicu eksplisit via API (ini tetap jalan).
+      - name: Trigger release build
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run release.yml -f tag="v${{ steps.bump.outputs.version }}"
