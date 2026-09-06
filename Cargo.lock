@@ -4676,7 +4676,7 @@ checksum = "7008a9d8ba97a7e47d9b2df63fcdb8dade303010c5a7cd5bf2469d4da6eba673"
 
 [[package]]
 name = "yakocode"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "ansi_colours",
  "anyhow",
