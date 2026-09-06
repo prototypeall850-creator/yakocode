@@ -27,14 +27,40 @@ mode CMD/REPL/TUI, dan HTTP server — plus **MCP Filesystem** dan
 
 ## Install
 
-### Opsi 1 — dari GitHub (disarankan)
+### Opsi 1 — download binary (paling gampang)
+
+Halaman release: https://github.com/prototypeall850-creator/yakocode/releases
+
+| Perangkat | File |
+| --------- | ---- |
+| Linux x86_64 | `yakocode-v0.1.0-x86_64-unknown-linux-musl.tar.gz` (statik, jalan di mana saja) |
+| Termux / Android aarch64 | `yakocode-v0.1.0-aarch64-linux-android.tar.gz` |
+| Windows x86_64 | `yakocode-v0.1.0-x86_64-pc-windows-msvc.zip` |
+
+```sh
+# Linux / Termux
+tar -xzf yakocode-v0.1.0-*.tar.gz
+./yakocode-v0.1.0-*/yakocode --help
+```
+
+Di Termux:
+
+```sh
+pkg install tar
+tar -xzf yakocode-v0.1.0-aarch64-linux-android.tar.gz
+./yakocode-v0.1.0-aarch64-linux-android/yakocode --help
+# opsional: pindah ke PATH
+# mv yakocode-v0.1.0-aarch64-linux-android/yakocode $PREFIX/bin/
+```
+
+### Opsi 2 — via cargo
 
 ```sh
 cargo install --git https://github.com/prototypeall850-creator/yakocode
 yakocode --help
 ```
 
-### Opsi 2 — dari source
+### Opsi 3 — dari source
 
 ```sh
 git clone https://github.com/prototypeall850-creator/yakocode
@@ -42,7 +68,7 @@ cd yakocode
 cargo install --path .
 ```
 
-### Opsi 3 — binary debug manual
+### Opsi 4 — binary debug manual
 
 ```sh
 cargo build
