@@ -165,6 +165,7 @@ Perintah dalam TUI:
 | `/clear`      | kosongkan session                   |
 | `/save`       | simpan session                      |
 | `/quit` / Esc | keluar (auto-save kalau dirty)      |
+| `.help`       | bantuan perintah titik (`.info` `.model` `.role` `.session` `.save` `.clear` `.quit) |
 
 ### Session / Role / Agent / RAG
 

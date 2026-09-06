@@ -110,6 +110,14 @@ pub async fn run_tui<B: Backend>(
                     continue;
                 }
                 history.push(format!("> {line}"));
+                // Perintah titik ala REPL klasik (.help, .info, .model, ...)
+                // — sebelumnya lolos ke AI sebagai chat biasa (bug).
+                if line.starts_with('.') {
+                    if handle_dot_command(&config, &line, &mut history) {
+                        break;
+                    }
+                    continue;
+                }
                 if line == "/quit" || line == ":q" {
                     break;
                 }
@@ -204,6 +212,96 @@ pub async fn run_tui<B: Backend>(
     Ok(())
 }
 
+/// Perintah titik di TUI, meniru REPL klasik (src/repl/mod.rs).
+/// Mengembalikan true kalau TUI harus keluar. Error tidak dipropagasi —
+/// ditampilkan sebagai baris history agar TUI tidak crash.
+fn handle_dot_command(config: &GlobalConfig, line: &str, history: &mut Vec<String>) -> bool {
+    const TUI_HELP: &str = ".help                  tampilkan bantuan ini\n\
+        .info [role|session|rag|agent]  tampilkan info\n\
+        .model [id]           list / ganti model (mis. meta:muse-spark-1.3)\n\
+        .role [nama]          pakai role (tanpa nama: info role)\n\
+        .session [nama]       mulai/gabung session (tanpa nama: session temp)\n\
+        .save                 simpan session\n\
+        .clear                kosongkan session\n\
+        .quit                 keluar\n\
+        Perintah titik lengkap lainnya hanya ada di REPL klasik (tanpa --tui).";
+    let (cmd, args) = match line.split_once(' ') {
+        Some((c, a)) => (c, a.trim()),
+        None => (line, ""),
+    };
+    let out: Result<Option<bool>, anyhow::Error> = (|| {
+        match cmd {
+            ".help" => {
+                history.push(TUI_HELP.into());
+            }
+            ".quit" | ".exit" => return Ok(Some(true)),
+            ".clear" => {
+                config.write().empty_session()?;
+                history.push("(session dikosongkan)".into());
+            }
+            ".save" => {
+                config.write().save_session(None)?;
+                history.push("(session tersimpan)".into());
+            }
+            ".info" => {
+                let info = match args {
+                    "" => config.read().info()?,
+                    "role" => config.read().role_info()?,
+                    "session" => config.read().session_info()?,
+                    "rag" => config.read().rag_info()?,
+                    "agent" => config.read().agent_info()?,
+                    _ => anyhow::bail!("penggunaan: .info [role|session|rag|agent]"),
+                };
+                history.push(info);
+            }
+            ".model" => {
+                if args.is_empty() {
+                    let models: Vec<String> = list_models(&config.read(), ModelType::Chat)
+                        .into_iter()
+                        .take(30)
+                        .map(|m| m.id())
+                        .collect();
+                    history.push(format!("models:\n{}", models.join("\n")));
+                } else {
+                    config.write().set_model(args)?;
+                    history.push(format!("(model: {args})"));
+                }
+            }
+            ".role" => {
+                if args.is_empty() {
+                    match config.read().role_info() {
+                        Ok(i) => history.push(i),
+                        Err(_) => history.push("tidak ada role aktif".into()),
+                    }
+                } else {
+                    config.write().use_role(args)?;
+                    history.push(format!("(role: {args})"));
+                }
+            }
+            ".session" => {
+                if args.is_empty() {
+                    config.write().use_session(None)?;
+                } else {
+                    config.write().use_session(Some(args))?;
+                }
+                history.push("(session aktif)".into());
+            }
+            _ => history.push(
+                "perintah titik tidak dikenal di TUI — ketik .help. \
+                Daftar lengkap hanya ada di REPL klasik (jalankan tanpa --tui)."
+                    .into(),
+            ),
+        }
+        Ok(None)
+    })();
+    match out {
+        Ok(quit) => quit.unwrap_or(false),
+        Err(e) => {
+            history.push(format!("error: {e:#}"));
+            false
+        }
+    }
+}
 /// Satu turn chat penuh: Input -> embeddings(RAG) -> chat_completions ->
 /// after_chat_completion -> loop tool_results (max 5).
 async fn run_chat_turn(config: &GlobalConfig, prompt: &str) -> Result<String> {
@@ -230,4 +328,42 @@ async fn run_chat_turn(config: &GlobalConfig, prompt: &str) -> Result<String> {
     }
     // render markdown ke teks polos agar nyaman di TUI
     Ok(full_output)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use parking_lot::RwLock;
+    use std::sync::Arc;
+
+    fn test_config() -> GlobalConfig {
+        Arc::new(RwLock::new(Config::default()))
+    }
+
+    #[test]
+    fn dot_help_shows_options() {
+        let config = test_config();
+        let mut history = vec![];
+        let quit = handle_dot_command(&config, ".help", &mut history);
+        assert!(!quit);
+        assert_eq!(history.len(), 1);
+        assert!(history[0].contains(".model"));
+        assert!(history[0].contains(".session"));
+    }
+
+    #[test]
+    fn dot_unknown_gives_hint_not_ai_chat() {
+        let config = test_config();
+        let mut history = vec![];
+        let quit = handle_dot_command(&config, ".foo", &mut history);
+        assert!(!quit);
+        assert!(history[0].contains(".help"));
+    }
+
+    #[test]
+    fn dot_quit_signals_exit() {
+        let config = test_config();
+        let mut history = vec![];
+        assert!(handle_dot_command(&config, ".quit", &mut history));
+    }
 }
