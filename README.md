@@ -27,13 +27,35 @@ mode CMD/REPL/TUI, dan HTTP server — plus **MCP Filesystem** dan
 
 ## Install
 
-### Opsi 1 — download binary (paling gampang)
+### Opsi 1 — one-liner (paling gampang)
+
+macOS / Linux / Termux:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/prototypeall850-creator/yakocode/main/install.sh | sh
+```
+
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/prototypeall850-creator/yakocode/main/install.ps1 | iex
+```
+
+Versi tertentu atau folder tertentu:
+
+```sh
+YAKOCODE_VERSION=v0.1.0 YAKOCODE_INSTALL_DIR=~/.local/bin sh install.sh
+```
+
+### Opsi 2 — download binary manual
 
 Halaman release: https://github.com/prototypeall850-creator/yakocode/releases
 
 | Perangkat | File |
 | --------- | ---- |
 | Linux x86_64 | `yakocode-v0.1.0-x86_64-unknown-linux-musl.tar.gz` (statik, jalan di mana saja) |
+| macOS Apple Silicon | `yakocode-v0.1.0-aarch64-apple-darwin.tar.gz` |
+| macOS Intel | `yakocode-v0.1.0-x86_64-apple-darwin.tar.gz` |
 | Termux / Android aarch64 | `yakocode-v0.1.0-aarch64-linux-android.tar.gz` |
 | Windows x86_64 | `yakocode-v0.1.0-x86_64-pc-windows-msvc.zip` |
 
@@ -53,14 +75,14 @@ tar -xzf yakocode-v0.1.0-aarch64-linux-android.tar.gz
 # mv yakocode-v0.1.0-aarch64-linux-android/yakocode $PREFIX/bin/
 ```
 
-### Opsi 2 — via cargo
+### Opsi 3 — via cargo
 
 ```sh
 cargo install --git https://github.com/prototypeall850-creator/yakocode
 yakocode --help
 ```
 
-### Opsi 3 — dari source
+### Opsi 4 — dari source
 
 ```sh
 git clone https://github.com/prototypeall850-creator/yakocode
@@ -68,7 +90,7 @@ cd yakocode
 cargo install --path .
 ```
 
-### Opsi 4 — binary debug manual
+### Opsi 5 — binary debug manual
 
 ```sh
 cargo build
