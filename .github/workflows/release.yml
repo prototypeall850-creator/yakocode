@@ -109,4 +109,5 @@ jobs:
           tag_name: ${{ env.TAG }}
           draft: false
           prerelease: false
+          generate_release_notes: true
           files: ${{ steps.package.outputs.archive }}

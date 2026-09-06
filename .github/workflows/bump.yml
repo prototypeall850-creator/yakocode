@@ -1,0 +1,47 @@
+name: Auto version bump
+
+# Tiap push ke main (selain commit bump itu sendiri):
+# naikkan patch di Cargo.toml/Cargo.lock -> commit [skip ci] -> tag vX.Y.Z.
+# Tag tersebut memicu workflow Release yang build + publish asset.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  bump:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump patch version
+        id: bump
+        shell: bash
+        run: |
+          set -euo pipefail
+          ver="$(grep -m1 '^version' Cargo.toml | sed 's/.*"\(.*\)"/\1/')"
+          major="${ver%%.*}"; rest="${ver#*.}"
+          minor="${rest%%.*}"; patch="${rest#*.}"
+          new="$major.$minor.$((patch + 1))"
+          echo "old=$ver new=$new"
+          sed -i "0,/^version = \"$ver\"/s//version = \"$new\"/" Cargo.toml
+          # samakan entry yakocode di Cargo.lock (tanpa perlu cargo)
+          perl -0pi -e "s/name = \"yakocode\"\nversion = \"$ver\"/name = \"yakocode\"\nversion = \"$new\"/" Cargo.lock
+          grep -m1 '^version' Cargo.toml
+          echo "version=$new" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add Cargo.toml Cargo.lock
+          git commit -m "chore: bump v${{ steps.bump.outputs.version }}" -m "[skip ci]"
+          git tag "v${{ steps.bump.outputs.version }}"
+          git push origin main "v${{ steps.bump.outputs.version }}"
