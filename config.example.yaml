@@ -80,10 +80,10 @@ right_prompt:
 
 # ---- misc ----
 serve_addr: 127.0.0.1:8000                  # Server listening address 
-user_agent: null                            # Set User-Agent HTTP header, use `auto` for aichat/<current-version>
+user_agent: null                            # Set User-Agent HTTP header, use `auto` for yakocode/<current-version>
 save_shell_history: true                    # Whether to save shell execution command to the history file
-# URL to sync model changes from, e.g., https://cdn.jsdelivr.net/gh/sigoden/aichat@main/models.yaml
-sync_models_url: https://raw.githubusercontent.com/sigoden/aichat/refs/heads/main/models.yaml
+# URL to sync model changes from, e.g., https://cdn.jsdelivr.net/gh/prototypeall850-creator/yakocode@main/models.yaml
+sync_models_url: https://raw.githubusercontent.com/prototypeall850-creator/yakocode/main/models.yaml
 
 # ---- clients ----
 clients:

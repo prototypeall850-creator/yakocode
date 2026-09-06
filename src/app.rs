@@ -15,7 +15,7 @@ use ratatui::{
 use std::path::PathBuf;
 use std::time::Duration;
 
-/// Ratatui TUI di atas full backend aichat:
+/// Ratatui TUI di atas full backend yakocode:
 /// roles, sessions, agents, RAG, functions/macros, plus MCP filesystem.
 /// Perintah: teks biasa (chat), /read <file>, /ls <dir>, /tools,
 /// /info, /models, /clear, /save, /quit.

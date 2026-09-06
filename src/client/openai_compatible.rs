@@ -39,7 +39,7 @@ fn prepare_chat_completions(
     self_: &OpenAICompatibleClient,
     data: ChatCompletionsData,
 ) -> Result<RequestData> {
-    // Meta Model API docs pakai MODEL_API_KEY; aichat-style config pakai {PROVIDER}_API_KEY
+    // Meta Model API docs pakai MODEL_API_KEY; config-style pakai {PROVIDER}_API_KEY
     // (META_API_KEY). Dukung keduanya untuk provider "meta".
     let mut api_key = self_.get_api_key().ok();
     if api_key.is_none() && self_.name() == "meta" {

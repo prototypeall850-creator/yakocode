@@ -2,7 +2,7 @@
 name = "yakocode"
 version = "0.1.0"
 edition = "2021"
-description = "CLI AI Chat Rust - full aichat core (roles, sessions, agents, RAG, functions, serve) + Ratatui + MCP Filesystem + Meta provider"
+description = "CLI AI Chat Rust - roles, sessions, agents, RAG, functions, serve + Ratatui + MCP Filesystem + Meta provider"
 license = "MIT OR Apache-2.0"
 
 [[bin]]
@@ -93,3 +93,7 @@ arboard = { version = "3.3.0", default-features = false }
 lto = true
 strip = true
 opt-level = "z"
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"
+rand = "0.9.0"

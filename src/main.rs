@@ -33,13 +33,21 @@ use parking_lot::RwLock;
 use simplelog::{format_description, ConfigBuilder, LevelFilter, SimpleLogger, WriteLogger};
 use std::{env, process, sync::Arc};
 
+const YAKO_REPO: &str = "https://github.com/prototypeall850-creator/yakocode";
+
 #[tokio::main]
 async fn main() -> Result<()> {
+    // yakocode update — self-update tanpa perlu ingat perintah cargo.
+    // Dicek sebelum Cli::parse agar "update" tidak dianggap teks chat.
+    let argv: Vec<String> = env::args().collect();
+    if is_update_command(&argv) {
+        return run_self_update();
+    }
     load_env_file()?;
     let mut cli = Cli::parse();
 
     // yakocode shortcut: --provider meta -> model meta:muse-spark-1.3
-    // (full id form; aichat resolves `client:model` via Model::retrieve_model)
+    // (full id form; resolved as `client:model` via Model::retrieve_model)
     if cli.model.is_none() {
         if let Some(p) = cli.provider.as_deref() {
             if p.eq_ignore_ascii_case("meta") {
@@ -71,6 +79,45 @@ async fn main() -> Result<()> {
         std::process::exit(1);
     }
     Ok(())
+}
+
+/// `true` kalau dipanggil persis sebagai `yakocode update`.
+fn is_update_command(argv: &[String]) -> bool {
+    argv.len() == 2 && argv[1] == "update"
+}
+
+/// Self-update: install ulang dari repo GitHub (butuh `cargo` + `git`).
+/// Alternatif manual: `git pull && cargo install --path .` di folder source.
+fn run_self_update() -> Result<()> {
+    println!("Updating yakocode from {YAKO_REPO} ...");
+    let status = std::process::Command::new("cargo")
+        .args(["install", "--git", YAKO_REPO])
+        .status()
+        .map_err(|e| {
+            anyhow::anyhow!("gagal menjalankan cargo: {e}. Install Rust via https://rustup.rs dulu.")
+        })?;
+    if !status.success() {
+        bail!("update gagal (cargo exit {status}). Coba manual: git pull && cargo install --path .");
+    }
+    println!("yakocode berhasil diupdate. Jalankan `yakocode --version` untuk cek.");
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn update_command_detected() {
+        assert!(is_update_command(&["yakocode".into(), "update".into()]));
+        assert!(!is_update_command(&["yakocode".into()]));
+        assert!(!is_update_command(&[
+            "yakocode".into(),
+            "update".into(),
+            "extra".into()
+        ]));
+        assert!(!is_update_command(&["yakocode".into(), "halo".into()]));
+    }
 }
 
 async fn run(config: GlobalConfig, cli: Cli, text: Option<String>) -> Result<()> {

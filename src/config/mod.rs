@@ -66,7 +66,7 @@ const CLIENTS_FIELD: &str = "clients";
 const SERVE_ADDR: &str = "127.0.0.1:8000";
 
 const SYNC_MODELS_URL: &str =
-    "https://raw.githubusercontent.com/sigoden/aichat/refs/heads/main/models.yaml";
+    "https://raw.githubusercontent.com/prototypeall850-creator/yakocode/main/models.yaml";
 
 const SUMMARIZE_PROMPT: &str =
     "Summarize the discussion briefly in 200 words or less to use as a prompt for future context.";
@@ -1541,7 +1541,7 @@ impl Config {
         if !agent_config_path.exists() {
             std::fs::write(
                 &agent_config_path,
-                "# see https://github.com/sigoden/aichat/blob/main/config.agent.example.yaml\n",
+                "# see https://github.com/prototypeall850-creator/yakocode/blob/main/config.agent.example.yaml\n",
             )
             .with_context(|| format!("Failed to write to '{}'", agent_config_path.display()))?;
         }
@@ -2638,7 +2638,7 @@ async fn create_config_file(config_path: &Path) -> Result<()> {
 
     let config_data = serde_yaml::to_string(&config).with_context(|| "Failed to create config")?;
     let config_data = format!(
-        "# see https://github.com/sigoden/aichat/blob/main/config.example.yaml\n\n{config_data}"
+        "# see https://github.com/prototypeall850-creator/yakocode/blob/main/config.example.yaml\n\n{config_data}"
     );
 
     ensure_parent_exists(config_path)?;

@@ -100,7 +100,7 @@ async fn markdown_stream_inner(
                         }
                     };
 
-                    // Fix unexpected duplicate lines on kitty, see https://github.com/sigoden/aichat/issues/105
+                    // Fix unexpected duplicate lines on kitty terminal
                     if col == 0 && row > 0 && display_width(&buffer) == columns as usize {
                         row -= 1;
                     }

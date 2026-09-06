@@ -1,22 +1,23 @@
 # yakocode
 
-CLI AI Chat berbasis Rust: full core ala [sigoden/aichat](https://github.com/sigoden/aichat)
-(roles, sessions, agents, RAG, function-calling, CMD/REPL, HTTP server)
-ditambah **TUI Ratatui**, **MCP Filesystem**, dan **provider Meta Model API**
-(`muse-spark-1.3` / `muse-spark-1.1`).
+CLI AI Chat berbasis Rust: roles, sessions, agents, RAG, function-calling,
+mode CMD/REPL/TUI, dan HTTP server — plus **MCP Filesystem** dan
+**provider Meta Model API** (`muse-spark-1.3` / `muse-spark-1.1`).
 
 ## Fitur
 
 - **Multi-provider**: OpenAI, Claude, Gemini, Cohere, Azure, VertexAI, Bedrock,
   19 provider OpenAI-compatible — termasuk `meta` (`https://api.meta.ai/v1`).
 - **CMD mode**: `yakocode "pertanyaan"`, pipe stdin, `-f file/dir/url`.
-- **REPL mode**: reedline interaktif (bawaan aichat).
+- **REPL mode**: interaktif dengan history dan autocomplete.
 - **TUI mode** (`--tui`): antarmuka Ratatui + perintah `/read` `/ls` via MCP.
 - **Shell Assistant** (`-e`): ubah bahasa natural jadi shell command.
 - **Role / Session / Agent / Macro / RAG / Functions**.
 - **Serve** (`--serve`): API OpenAI-compatible + playground/arena web.
-- **MCP Filesystem**: baca/list file lokal lewat `npx @modelcontextprotocol/server-filesystem`
+- **MCP Filesystem**: baca/list file lokal lewat
+  `npx @modelcontextprotocol/server-filesystem`
   (otomatis fallback baca langsung kalau server gagal start).
+- **Self-update**: `yakocode update`.
 
 ## Syarat
 
@@ -47,6 +48,26 @@ cargo install --path .
 cargo build
 ./target/debug/yakocode --help
 ```
+
+## Update
+
+Di HP (Termux) atau di mana pun, cukup:
+
+```sh
+yakocode update
+```
+
+Perintah ini menjalankan `cargo install --git <repo-yakocode>` ulang
+(butuh `cargo` + `git`). Alternatif manual:
+
+```sh
+cd yakocode
+git pull
+cargo install --path .
+```
+
+> Catatan: karena `update` dipakai sebagai perintah khusus,
+> untuk chat yang isinya persis kata `update` gunakan `yakocode -- update`.
 
 ## Konfigurasi awal
 
@@ -155,10 +176,9 @@ yakocode --sync-models
 - MCP `/read` gagal padahal file ada → pastikan `npx` terinstall;
   tanpa `npx`, TUI otomatis pakai fallback baca-langsung (hanya dalam `--allow-dir`).
 
-## Kredit
+## Kredit & Lisensi
 
-Core chat (client, config, RAG, REPL, serve, functions) berasal dari
-[sigoden/aichat](https://github.com/sigoden/aichat) (MIT/Apache-2.0).
-Modifikasi yakocode: TUI Ratatui (`src/app.rs`), MCP filesystem (`src/mcp.rs`),
-provider `meta` (`models.yaml`, `src/client/mod.rs`,
-`src/client/openai_compatible.rs`), flag `--tui/--allow-dir/--provider`.
+Proyek ini dikembangkan dari codebase open-source berlisensi ganda
+**MIT / Apache-2.0** (file `LICENSE-MIT` dan `LICENSE-APACHE`),
+dengan tambahan TUI Ratatui (`src/app.rs`), MCP filesystem (`src/mcp.rs`),
+provider `meta`, dan perintah `yakocode update`.
